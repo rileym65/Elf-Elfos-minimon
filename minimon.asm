@@ -6,25 +6,19 @@
 ; *** without express written permission from the author.         ***
 ; *******************************************************************
 
+.op "PUSH","N","9$1 73 8$1 73"
+.op "POP","N","60 72 A$1 F0 B$1"
+.op "CALL","W","D4 H1 L1"
+.op "RTN","","D5"
+.op "MOV","NR","9$2 B$1 8$2 A$1"
+.op "MOV","NW","F8 H2 B$1 F8 L2 A$1"
+
 include    bios.inc
 include    kernel.inc
 
-           org     8000h
-           lbr     0ff00h
-           db      'minimon',0
-           dw      9000h
-           dw      endrom+3200h
-           dw      5e00h
-           dw      endrom-5e00h
-           dw      5e00h
-           db      0
-
-
-           org     05e00h
-           br      mainlp
-
-include    date.inc
-include    build.inc
+           org     6000h
+begin:     br      mainlp
+           eever
            db      'Written by Michael H. Riley',0
 
 mainlp:    ldi     high prompt         ; get address of prompt
@@ -54,7 +48,7 @@ mainlp:    ldi     high prompt         ; get address of prompt
            smi     33
            lbz     storesp
            smi     14                  ; check for / return to os
-           lbz     303h
+           lbz     exit
            smi     14                  ; look for copy command
            lbz     copy                ; jump if found
            smi     2
@@ -190,8 +184,12 @@ docrlf:    ldi     high crlf
            dw      o_msg
            sep     sret
 
+exit:      ldi     0
+           sep     sret
 prompt:    db      '>',0
 crlf:      db      10,13,0
 
 endrom:    equ     $
+
+           end     begin
 
